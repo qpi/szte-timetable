@@ -1,0 +1,49 @@
+<project default="dist">
+
+	<property file="./build.properties" />
+	<property name="app.build" value="${app.path}/${app.name}/build"/>
+	<property name="app.src" value="${app.path}/${app.name}/src"/>
+	<property name="app.lib" value="${app.path}/${app.name}/lib"/>
+	
+	<path id="compile.classpath">
+		<fileset dir="${app.lib}" >
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="clean" description="Delete and re-create build directory">
+		<delete dir="${app.build}" failonerror="false"/>
+		<delete dir="exec" failonerror="false" />
+		<mkdir dir="${app.build}"/>
+		<mkdir dir="exec"/>
+	</target>
+
+	<target name="compile" depends="clean">
+		<javac encoding="8859_1"
+		 includeantruntime="true"
+			target="${compile.target}"
+			source="${compile.source}"
+			srcdir="${app.src}" 
+			destdir="${app.build}" 
+			debug="${compile.debug}" 
+			deprecation="${compile.deprecation}" 
+			optimize="${compile.optimize}">
+			<classpath refid="compile.classpath" />
+		</javac>
+	</target>
+
+	<target name="dist" depends="compile" description="Create jar distribution">
+		<!-- Create the jar file. It will included all the resources (for example: help.txt) all the jar files from the lib folder -->
+		<jar jarfile="exec/${app.name}.jar" basedir="${app.build}">
+			<zipgroupfileset dir="${app.lib}" includes="*.jar"/>
+			<manifest>
+				<!-- Set the default main class for the .jar file -->
+				<attribute name="Main-Class" value="etr.TimetableGUI"/>
+	 		</manifest>
+	 	</jar>
+		<!-- Create the loader bach file for Windows -->
+		<!--<echo file="exec/timetable.bat">@java -jar ${app.name}.jar %*</echo> -->
+
+	</target>
+
+</project>
